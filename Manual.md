@@ -759,9 +759,9 @@ built for, available architectures can be found under `common/cross-profiles`.
 In general, `archs` should only be set if the upstream software explicitly targets
 certain architectures or there is a compelling reason why the software should not be
 available on some supported architectures.
-Prepending pattern with tilde means disallowing build on indicated archs.
-First matching pattern is taken to allow/deny build. When no pattern matches,
-package is build if last pattern includes tilde.
+Prepending a pattern with a tilde means disallowing build on the indicated archs.
+The first matching pattern is taken to allow/deny build. When no pattern matches,
+the package is built if the last pattern includes a tilde.
 Examples:
 
 	```
@@ -777,6 +777,9 @@ A special value `noarch` used to be available, but has since been removed.
 - `nocheckperms` If set, xbps-src will not fail on common permission errors (world writable files, etc.)
 
 - `nofixperms` If set, xbps-src will not fix common permission errors (executable manpages, etc.)
+
+- `no_generic_pkgconfig_link` If set, xbps-src will not create a symlink from `$XBPS_CROSS_TRIPLET-pkg-config`
+  to `$XBPS_WRAPPERDIR/pkg-config` before building the template.
 
 <a id="explain_depends"></a>
 #### About the many types of `depends` variables
@@ -1801,8 +1804,19 @@ executable binary formats, know as binfmts.
 During installation/removal it uses `update-binfmts` from the `binfmt-support` package
 to register/remove entries from the arbitrary executable binary formats database.
 
-To include the trigger use the `binfmts` variable, as the trigger won't do anything unless
-it is defined.
+It is automatically added to packages that contain files in `usr/share/binfmts`.
+These files should be `update-binfmts` format files and will be imported with
+`update-binfmts --import`.
+
+While it is not preferred, the trigger can also be added by using the `binfmts` variable,
+which should contain lines defining binfmts to register:
+
+```
+/path/to/interpreter [update-binfmts binary format specification arguments ...]
+...
+```
+
+See [`update-binfmts(8)`](https://man.voidlinux.org/man8/update-binfmts.8) for more details.
 
 <a id="triggers_dkms"></a>
 #### dkms
